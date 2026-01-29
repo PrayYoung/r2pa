@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+.env
+
+# Data artifacts
+data/processed/
+data/raw/
+
+# Models
+models/
+checkpoints/
+
+# logs
+tb_logs/
+logs/
+
+# OS
+.DS_Store
