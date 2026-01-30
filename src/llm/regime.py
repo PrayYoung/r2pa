@@ -1,4 +1,3 @@
-import json
 from dataclasses import dataclass
 from typing import Dict
 
@@ -16,7 +15,7 @@ class RegimeFeatures:
 def heuristic_regime(mkt_summary: Dict) -> RegimeFeatures:
     """
     """
-    # 例：用简单规则当占位
+    # placeholder
     vol = float(mkt_summary.get("vol_20d", 0.2))
     mom = float(mkt_summary.get("mom_60d", 0.0))
     risk_on = 1 if (mom > 0 and vol < 0.25) else (-1 if (mom < 0 and vol > 0.25) else 0)

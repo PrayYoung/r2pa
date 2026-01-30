@@ -5,7 +5,7 @@ from src.config import CFG
 
 def download_prices(tickers, start, end) -> pd.DataFrame:
     df = yf.download(tickers, start=start, end=end, auto_adjust=True, progress=False)
-    # auto_adjust=True 会把分红拆股调整进价格
+    # auto_adjust=True # Adjusts prices for dividends and splits
     prices = df["Close"].copy()
     prices = prices.dropna(how="all")
     prices = prices.ffill().dropna()

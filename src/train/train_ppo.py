@@ -14,7 +14,7 @@ def main():
     os.makedirs("models", exist_ok=True)
     rets = load_returns()
 
-    # 简单 time split：80% train
+    # 80% train
     split = int(len(rets) * 0.8)
     train_rets = rets.iloc[:split].copy()
 
