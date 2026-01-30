@@ -5,10 +5,19 @@ import pandas as pd
 
 from src.config import CFG
 from src.llm.store import save_regime_store
-from src.llm.oracle_local_vllm import vllm_regime_from_summary
+from src.llm.oracle_local import local_regime_from_summary
+
 
 def load_returns(path="data/processed/returns.parquet"):
     return pd.read_parquet(path)
+
+
+def load_news_features(path="data/processed/news_features.parquet"):
+    df = pd.read_parquet(path)
+    if not isinstance(df.index, pd.DatetimeIndex):
+        df.index = pd.to_datetime(df.index)
+    return df.sort_index()
+
 
 def compute_market_summary(window_rets: np.ndarray) -> dict:
     mkt = window_rets.mean(axis=1)
@@ -19,11 +28,17 @@ def compute_market_summary(window_rets: np.ndarray) -> dict:
     mkt_mdd = float((nav / peak - 1.0).min())
     return {"mkt_mom": mkt_mom, "mkt_vol": mkt_vol, "mkt_mdd": mkt_mdd}
 
+
 def main():
     os.makedirs("data/processed", exist_ok=True)
+
     rets = load_returns()
     rets_np = rets.to_numpy(dtype=np.float32)
+    ret_idx = pd.to_datetime(rets.index)
 
+    news_df = load_news_features()
+
+    # Cache to avoid re-querying the model
     cache_path = "data/processed/regime_features_local_cache.jsonl"
     cache = {}
     if os.path.exists(cache_path):
@@ -35,21 +50,39 @@ def main():
     rows, idx = [], []
     new_lines = []
 
-    for t in range(CFG.window, len(rets) - 2):
-        dt_str = pd.to_datetime(rets.index[t]).strftime("%Y-%m-%d")
+    # for t in range(CFG.window, len(rets) - 2):
+    for t in range(CFG.window, min(len(rets) - 2, CFG.window + 5)):
+        dt = pd.to_datetime(ret_idx[t])
+        dt_str = dt.strftime("%Y-%m-%d")
+
         window_rets = rets_np[t - CFG.window:t, :]
         summary = compute_market_summary(window_rets)
+
+        # Merge Phase-1 text features into the summary dict
+        if dt in news_df.index:
+            nf = news_df.loc[dt]
+            summary["news_count"] = float(nf.get("news_count", 0.0))
+            summary["news_var"] = float(nf.get("news_var", 0.0))
+            summary["news_shift"] = float(nf.get("news_shift", 0.0))
+        else:
+            summary["news_count"] = 0.0
+            summary["news_var"] = 0.0
+            summary["news_shift"] = 0.0
 
         if dt_str in cache:
             feat = cache[dt_str]
         else:
-            rf = vllm_regime_from_summary(summary, news_bullets=[])
+            rf = local_regime_from_summary(
+                summary,
+                news_bullets=[],
+                backend="ollama",
+                model="llama3:latest")
             feat = rf.to_vector()
             cache[dt_str] = feat
             new_lines.append({"date": dt_str, "summary": summary, "features": feat})
 
         rows.append(feat)
-        idx.append(pd.to_datetime(rets.index[t]))
+        idx.append(dt)
 
     if new_lines:
         with open(cache_path, "a", encoding="utf-8") as f:
@@ -64,6 +97,7 @@ def main():
 
     save_regime_store(df)
     print(f"Saved LOCAL vLLM regime features: {CFG.regime_store_path} | shape={df.shape}")
+
 
 if __name__ == "__main__":
     main()
