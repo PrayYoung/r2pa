@@ -26,7 +26,7 @@ def load_news_map_from_jsonl(path: str, index: pd.DatetimeIndex) -> Dict[pd.Time
     return out
 
 
-def load_news_map(index: pd.DatetimeIndex, path: str = "data/processed/news_daily.jsonl"):
+def load_news_map(index: pd.DatetimeIndex, path: str = "artifacts/data/processed/news_daily.jsonl"):
     """
     Unified entry: real Alpaca news if available; otherwise fall back to mock.
     """

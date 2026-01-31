@@ -11,11 +11,11 @@ from src.text.encoder import NewsEncoder
 from src.text.select_bullets import select_representative_bullets
 
 
-def load_returns(path="data/processed/returns.parquet"):
+def load_returns(path="artifacts/data/processed/returns.parquet"):
     return pd.read_parquet(path)
 
 
-def load_news_features(path="data/processed/news_features.parquet"):
+def load_news_features(path="artifacts/data/processed/news_features.parquet"):
     df = pd.read_parquet(path)
     if not isinstance(df.index, pd.DatetimeIndex):
         df.index = pd.to_datetime(df.index)
@@ -33,7 +33,7 @@ def compute_market_summary(window_rets: np.ndarray) -> dict:
 
 
 def main():
-    os.makedirs("data/processed", exist_ok=True)
+    os.makedirs("artifacts/data/processed", exist_ok=True)
 
     rets = load_returns()
     rets_np = rets.to_numpy(dtype=np.float32)
@@ -46,7 +46,7 @@ def main():
 
 
     # Cache to avoid re-querying the model
-    cache_path = "data/processed/regime_features_local_cache.jsonl"
+    cache_path = "artifacts/data/processed/regime_features_local_cache.jsonl"
     cache = {}
     if os.path.exists(cache_path):
         with open(cache_path, "r", encoding="utf-8") as f:

@@ -18,9 +18,9 @@ def compute_market_summary(window_rets: np.ndarray) -> dict:
 
 
 def main():
-    os.makedirs("data/processed", exist_ok=True)
+    os.makedirs("artifacts/data/processed", exist_ok=True)
 
-    rets = pd.read_parquet("data/processed/returns.parquet")
+    rets = pd.read_parquet("artifacts/data/processed/returns.parquet")
     rets_np = rets.to_numpy(dtype=np.float32)
     idx = pd.to_datetime(rets.index)
 
@@ -30,7 +30,7 @@ def main():
     teacher = teacher.sort_index()
 
     # Numeric news features (3-dim)
-    news = pd.read_parquet("data/processed/news_features.parquet")
+    news = pd.read_parquet("artifacts/data/processed/news_features.parquet")
     news.index = pd.to_datetime(news.index)
     news = news.sort_index()
 
@@ -73,7 +73,7 @@ def main():
         )
 
     df = pd.DataFrame(rows).set_index("date").sort_index()
-    out_path = "data/processed/student_dataset.parquet"
+    out_path = "artifacts/data/processed/student_dataset.parquet"
     df.to_parquet(out_path)
     print(f"Saved: {out_path} | shape={df.shape} | {df.index.min()}..{df.index.max()}")
 

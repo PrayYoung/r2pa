@@ -7,10 +7,10 @@ from src.text.news_alpaca import fetch_alpaca_news_daily, save_news_daily_jsonl
 
 
 def main():
-    os.makedirs("data/processed", exist_ok=True)
+    os.makedirs("artifacts/data/processed", exist_ok=True)
 
     # Use your returns index as the canonical calendar
-    rets = pd.read_parquet("data/processed/returns.parquet")
+    rets = pd.read_parquet("artifacts/data/processed/returns.parquet")
     idx = pd.to_datetime(rets.index)
 
     # start_date = idx.min().strftime("%Y-%m-%d")
@@ -29,7 +29,7 @@ def main():
         include_content=False,  # start with headline+summary only
     )
 
-    out_path = "data/processed/news_daily.jsonl"
+    out_path = "artifacts/data/processed/news_daily.jsonl"
     save_news_daily_jsonl(daily, out_path=out_path, symbols=symbols)
 
     total_days = len(daily)

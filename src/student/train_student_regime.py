@@ -34,9 +34,9 @@ def standardize(train_x: np.ndarray, x: np.ndarray):
 
 
 def main():
-    os.makedirs("models", exist_ok=True)
+    os.makedirs("artifacts/models", exist_ok=True)
 
-    df = pd.read_parquet("data/processed/student_dataset.parquet").sort_index()
+    df = pd.read_parquet("artifacts/data/processed/student_dataset.parquet").sort_index()
 
     # Simple time split: last 20% as validation
     n = len(df)
@@ -97,9 +97,9 @@ def main():
                 "features": FEATURES,
                 "targets": TARGETS,
             }
-            torch.save(ckpt, "models/student_regime.pt")
+            torch.save(ckpt, "artifacts/models/student_regime.pt")
 
-    print("Saved: models/student_regime.pt")
+    print("Saved: artifacts/models/student_regime.pt")
 
 
 if __name__ == "__main__":

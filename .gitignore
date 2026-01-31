@@ -11,6 +11,7 @@ __pycache__/
 # Data artifacts
 data/processed/
 data/raw/
+artifacts/
 
 # Models
 models/

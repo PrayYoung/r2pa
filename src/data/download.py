@@ -12,9 +12,9 @@ def download_prices(tickers, start, end) -> pd.DataFrame:
     return prices
 
 def main():
-    os.makedirs("data/raw", exist_ok=True)
+    os.makedirs("artifacts/data/raw", exist_ok=True)
     prices = download_prices(CFG.tickers, CFG.start, CFG.end)
-    path = "data/raw/prices.parquet"
+    path = "artifacts/data/raw/prices.parquet"
     prices.to_parquet(path)
     print(f"Saved: {path} | shape={prices.shape} | from {prices.index.min()} to {prices.index.max()}")
 

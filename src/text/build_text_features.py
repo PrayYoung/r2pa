@@ -8,9 +8,9 @@ from src.text.encoder import NewsEncoder
 from src.text.features import summarize_embeddings
 
 def main():
-    os.makedirs("data/processed", exist_ok=True)
+    os.makedirs("artifacts/data/processed", exist_ok=True)
 
-    rets = pd.read_parquet("data/processed/returns.parquet")
+    rets = pd.read_parquet("artifacts/data/processed/returns.parquet")
     idx = pd.to_datetime(rets.index)
 
     news_map = load_mock_news(idx)
@@ -27,7 +27,7 @@ def main():
         prev_emb = emb
 
     df = pd.DataFrame(rows, index=idx).sort_index()
-    out_path = "data/processed/news_features.parquet"
+    out_path = "artifacts/data/processed/news_features.parquet"
     df.to_parquet(out_path)
     print(f"Saved text features: {out_path} | shape={df.shape}")
 

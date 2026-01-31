@@ -38,5 +38,5 @@ uv run python -m src.eval.diagnostics
 
 ## Notes
 
-- Large artifacts are intentionally excluded from git: data/processed/, models/, .venv/.
+- Large artifacts are intentionally excluded from git: artifacts/, .venv/.
 - The Regime Oracle is designed to be swappable without changing the RL env/policy code.

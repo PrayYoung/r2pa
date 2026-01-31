@@ -4,7 +4,7 @@ from stable_baselines3 import PPO
 from src.config import CFG
 from src.env.portfolio_env import PortfolioEnv
 
-def load_returns(path="data/processed/returns.parquet"):
+def load_returns(path="artifacts/data/processed/returns.parquet"):
     return pd.read_parquet(path)
 
 def backtest(model, returns: pd.DataFrame):
@@ -40,7 +40,7 @@ def main():
 
     test_returns = returns.iloc[split:].copy()
 
-    model = PPO.load("models/ppo_portfolio")
+    model = PPO.load("artifacts/models/ppo_portfolio")
 
     nav, rets = backtest(model, test_returns)
 

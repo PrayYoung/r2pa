@@ -7,7 +7,7 @@ from src.config import CFG
 from src.llm.store import save_regime_store
 from src.llm.oracle_openai import openai_regime_from_summary
 
-def load_returns(path="data/processed/returns.parquet"):
+def load_returns(path="artifacts/data/processed/returns.parquet"):
     return pd.read_parquet(path)
 
 def compute_market_summary(window_rets: np.ndarray) -> dict:
@@ -20,11 +20,11 @@ def compute_market_summary(window_rets: np.ndarray) -> dict:
     return {"mkt_mom": mkt_mom, "mkt_vol": mkt_vol, "mkt_mdd": mkt_mdd}
 
 def main():
-    os.makedirs("data/processed", exist_ok=True)
+    os.makedirs("artifacts/data/processed", exist_ok=True)
     rets = load_returns()
     rets_np = rets.to_numpy(dtype=np.float32)
 
-    cache_path = "data/processed/regime_features_openai_cache.jsonl"
+    cache_path = "artifacts/data/processed/regime_features_openai_cache.jsonl"
     cache = {}
     if os.path.exists(cache_path):
         with open(cache_path, "r", encoding="utf-8") as f:

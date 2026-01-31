@@ -63,17 +63,17 @@ class StudentMLP(torch.nn.Module):
 
 
 def main():
-    os.makedirs("data/processed", exist_ok=True)
+    os.makedirs("artifacts/data/processed", exist_ok=True)
 
     # ---------- load data ----------
-    rets = pd.read_parquet("data/processed/returns.parquet")
+    rets = pd.read_parquet("artifacts/data/processed/returns.parquet")
     rets_np = rets.to_numpy(dtype=np.float32)
     idx = pd.to_datetime(rets.index)
 
-    news = pd.read_parquet("data/processed/news_features.parquet")
+    news = pd.read_parquet("artifacts/data/processed/news_features.parquet")
     news.index = pd.to_datetime(news.index)
 
-    ckpt = torch.load("models/student_regime.pt", map_location="cpu", weights_only=False)
+    ckpt = torch.load("artifacts/models/student_regime.pt", map_location="cpu", weights_only=False)
 
     mu = ckpt["mu"]
     sig = ckpt["sig"]
@@ -146,7 +146,7 @@ def main():
         columns=TARGET_COLUMNS,
     )
 
-    out_path = "data/processed/regime_features_student.parquet"
+    out_path = "artifacts/data/processed/regime_features_student.parquet"
     df.to_parquet(out_path)
     print(
         f"Saved student regime features: {out_path} | "

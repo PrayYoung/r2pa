@@ -5,7 +5,7 @@ from stable_baselines3 import PPO
 from src.config import CFG
 from src.env.portfolio_env import PortfolioEnv
 
-def load_returns(path="data/processed/returns.parquet"):
+def load_returns(path="artifacts/data/processed/returns.parquet"):
     return pd.read_parquet(path)
 
 def max_drawdown(nav: np.ndarray) -> float:
@@ -112,7 +112,7 @@ def main():
     split = int(len(returns) * 0.8)
     test_returns = returns.iloc[split:].copy()
 
-    model = PPO.load("models/ppo_portfolio")
+    model = PPO.load("artifacts/models/ppo_portfolio")
 
     nav_rl, rets_rl, dates = run_rl_policy(model, test_returns)
     nav_eq, rets_eq, _ = run_equal_weight_daily(test_returns)
@@ -140,8 +140,8 @@ def main():
     plt.ylabel("NAV")
     plt.legend()
     plt.tight_layout()
-    plt.savefig("data/processed/test_nav.png", dpi=160)
-    print("\nSaved plot: data/processed/test_nav.png")
+    plt.savefig("artifacts/data/processed/test_nav.png", dpi=160)
+    print("\nSaved plot: artifacts/data/processed/test_nav.png")
 
 if __name__ == "__main__":
     main()

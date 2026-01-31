@@ -7,11 +7,11 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 from src.config import CFG
 from src.env.portfolio_env import PortfolioEnv
 
-def load_returns(path="data/processed/returns.parquet") -> pd.DataFrame:
+def load_returns(path="artifacts/data/processed/returns.parquet") -> pd.DataFrame:
     return pd.read_parquet(path)
 
 def main():
-    os.makedirs("models", exist_ok=True)
+    os.makedirs("artifacts/models", exist_ok=True)
     rets = load_returns()
 
     # 80% train
@@ -36,7 +36,7 @@ def main():
         env=env,
         verbose=1,
         policy_kwargs=policy_kwargs,
-        tensorboard_log="tb_logs",
+        tensorboard_log="artifacts/tb_logs",
         n_steps=2048,
         batch_size=256,
         gamma=0.99,
@@ -46,8 +46,8 @@ def main():
 
     model.learn(total_timesteps=200_000,
                 tb_log_name="ppo_baseline")
-    model.save("models/ppo_portfolio")
-    print("Saved model to models/ppo_portfolio.zip")
+    model.save("artifacts/models/ppo_portfolio")
+    print("Saved model to artifacts/models/ppo_portfolio.zip")
 
 if __name__ == "__main__":
     main()

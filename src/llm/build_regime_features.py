@@ -7,11 +7,11 @@ from src.llm.oracle_heuristic import heuristic_from_summary
 from src.llm.store import save_regime_store
 
 
-def load_returns(path: str = "data/processed/returns.parquet") -> pd.DataFrame:
+def load_returns(path: str = "artifacts/data/processed/returns.parquet") -> pd.DataFrame:
     return pd.read_parquet(path)
 
 
-def load_news_features(path: str = "data/processed/news_features.parquet") -> pd.DataFrame:
+def load_news_features(path: str = "artifacts/data/processed/news_features.parquet") -> pd.DataFrame:
     """
     Load daily text-derived features:
       - news_count
@@ -42,7 +42,7 @@ def compute_market_summary(window_rets: np.ndarray) -> dict:
 
 
 def main():
-    os.makedirs("data/processed", exist_ok=True)
+    os.makedirs("artifacts/data/processed", exist_ok=True)
 
     rets = load_returns()
     rets_np = rets.to_numpy(dtype=np.float32)

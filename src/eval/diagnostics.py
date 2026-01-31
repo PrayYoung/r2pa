@@ -4,7 +4,7 @@ from stable_baselines3 import PPO
 from src.config import CFG
 from src.env.portfolio_env import PortfolioEnv
 
-def load_returns(path="data/processed/returns.parquet"):
+def load_returns(path="artifacts/data/processed/returns.parquet"):
     return pd.read_parquet(path)
 
 def main():
@@ -12,7 +12,7 @@ def main():
     split = int(len(returns) * 0.8)
     test_returns = returns.iloc[split:].copy()
 
-    model = PPO.load("models/ppo_portfolio")
+    model = PPO.load("artifacts/models/ppo_portfolio")
 
     env = PortfolioEnv(test_returns, window=CFG.window, trading_cost_bps=CFG.trading_cost_bps, cash_asset=CFG.cash_asset)
     obs, _ = env.reset()
