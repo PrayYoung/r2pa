@@ -35,6 +35,14 @@ uv run python -m portfolio_rl_agent_lab.eval.benchmarks
 uv run python -m portfolio_rl_agent_lab.eval.diagnostics
 ```
 
+CLI (after `uv sync`)
+```bash
+prl data download
+prl data news-alpaca --days 5
+prl rl train
+prl rl benchmarks
+```
+
 ## Notes
 
 - Large artifacts are intentionally excluded from git: artifacts/, .venv/.

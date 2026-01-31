@@ -19,6 +19,10 @@ dependencies = [
     "yfinance>=1.1.0",
 ]
 
+[project.scripts]
+prl = "portfolio_rl_agent_lab.cli.main:main"
+portfolio-rl-agent-lab = "portfolio_rl_agent_lab.cli.main:main"
+
 [build-system]
 requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
