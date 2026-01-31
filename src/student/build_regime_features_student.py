@@ -114,9 +114,13 @@ def main():
         )
 
         # standardize (same as training)
-        x_std = (x - mu) / sig
+        mu_ = np.squeeze(mu)
+        sig_ = np.squeeze(sig)
+        x_std = ((x - mu_) / sig_).astype(np.float32)
+        x_std = np.ravel(x_std)
         with torch.no_grad():
-            y = model(torch.from_numpy(x_std)).numpy()
+            y = model(torch.from_numpy(x_std).unsqueeze(0)).squeeze(0).numpy()
+
 
         # post-processing / safety clamps
         regime = float(np.clip(y[0], -1.0, 1.0))
