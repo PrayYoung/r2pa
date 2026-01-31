@@ -3,42 +3,10 @@ import numpy as np
 import pandas as pd
 
 from portfolio_rl_agent_lab.config import CFG
+from portfolio_rl_agent_lab.core.io import load_news_features, load_returns
+from portfolio_rl_agent_lab.core.market import compute_market_summary
 from portfolio_rl_agent_lab.llm.oracle_heuristic import heuristic_from_summary
 from portfolio_rl_agent_lab.llm.store import save_regime_store
-
-
-def load_returns(path: str = "artifacts/data/processed/returns.parquet") -> pd.DataFrame:
-    return pd.read_parquet(path)
-
-
-def load_news_features(path: str = "artifacts/data/processed/news_features.parquet") -> pd.DataFrame:
-    """
-    Load daily text-derived features:
-      - news_count
-      - news_var
-      - news_shift
-    """
-    df = pd.read_parquet(path)
-    if not isinstance(df.index, pd.DatetimeIndex):
-        df.index = pd.to_datetime(df.index)
-    return df.sort_index()
-
-
-def compute_market_summary(window_rets: np.ndarray) -> dict:
-    """
-    window_rets: (window, N_assets) returns window ending at t (exclusive of t+1)
-    """
-    # Equal-weight market proxy
-    mkt = window_rets.mean(axis=1)  # (window,)
-    mkt_mom = float(np.prod(1.0 + mkt) - 1.0)         # cumulative over window
-    mkt_vol = float(np.std(mkt) * np.sqrt(252.0))     # annualized volatility
-
-    # Max drawdown on market NAV within the window
-    nav = np.cumprod(1.0 + mkt)
-    peak = np.maximum.accumulate(nav)
-    mkt_mdd = float((nav / peak - 1.0).min())
-
-    return {"mkt_mom": mkt_mom, "mkt_vol": mkt_vol, "mkt_mdd": mkt_mdd}
 
 
 def build_regime_features_heuristic(

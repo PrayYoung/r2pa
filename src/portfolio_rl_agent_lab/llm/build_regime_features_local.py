@@ -4,32 +4,13 @@ import numpy as np
 import pandas as pd
 
 from portfolio_rl_agent_lab.config import CFG
+from portfolio_rl_agent_lab.core.io import load_news_features, load_returns
+from portfolio_rl_agent_lab.core.market import compute_market_summary
 from portfolio_rl_agent_lab.llm.store import save_regime_store
 from portfolio_rl_agent_lab.llm.oracle_local import local_regime_from_summary
 from portfolio_rl_agent_lab.text.news_loader import load_news_map
 from portfolio_rl_agent_lab.text.encoder import NewsEncoder
 from portfolio_rl_agent_lab.text.select_bullets import select_representative_bullets
-
-
-def load_returns(path="artifacts/data/processed/returns.parquet"):
-    return pd.read_parquet(path)
-
-
-def load_news_features(path="artifacts/data/processed/news_features.parquet"):
-    df = pd.read_parquet(path)
-    if not isinstance(df.index, pd.DatetimeIndex):
-        df.index = pd.to_datetime(df.index)
-    return df.sort_index()
-
-
-def compute_market_summary(window_rets: np.ndarray) -> dict:
-    mkt = window_rets.mean(axis=1)
-    mkt_mom = float(np.prod(1.0 + mkt) - 1.0)
-    mkt_vol = float(np.std(mkt) * np.sqrt(252.0))
-    nav = np.cumprod(1.0 + mkt)
-    peak = np.maximum.accumulate(nav)
-    mkt_mdd = float((nav / peak - 1.0).min())
-    return {"mkt_mom": mkt_mom, "mkt_vol": mkt_vol, "mkt_mdd": mkt_mdd}
 
 
 def build_regime_features_local(

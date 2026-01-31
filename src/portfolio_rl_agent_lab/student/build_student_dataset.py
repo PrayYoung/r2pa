@@ -5,16 +5,7 @@ import numpy as np
 import pandas as pd
 
 from portfolio_rl_agent_lab.config import CFG
-
-
-def compute_market_summary(window_rets: np.ndarray) -> dict:
-    mkt = window_rets.mean(axis=1)
-    mkt_mom = float(np.prod(1.0 + mkt) - 1.0)
-    mkt_vol = float(np.std(mkt) * np.sqrt(252.0))
-    nav = np.cumprod(1.0 + mkt)
-    peak = np.maximum.accumulate(nav)
-    mkt_mdd = float((nav / peak - 1.0).min())
-    return {"mkt_mom": mkt_mom, "mkt_vol": mkt_vol, "mkt_mdd": mkt_mdd}
+from portfolio_rl_agent_lab.core.market import compute_market_summary
 
 
 def build_student_dataset(

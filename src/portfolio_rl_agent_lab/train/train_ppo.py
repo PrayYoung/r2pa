@@ -5,10 +5,8 @@ import pandas as pd
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv
 from portfolio_rl_agent_lab.config import CFG
+from portfolio_rl_agent_lab.core.io import load_returns
 from portfolio_rl_agent_lab.env.portfolio_env import PortfolioEnv
-
-def load_returns(path="artifacts/data/processed/returns.parquet") -> pd.DataFrame:
-    return pd.read_parquet(path)
 
 def train_ppo(
     returns_path: str = "artifacts/data/processed/returns.parquet",

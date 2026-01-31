@@ -3,10 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from stable_baselines3 import PPO
 from portfolio_rl_agent_lab.config import CFG
+from portfolio_rl_agent_lab.core.io import load_returns
 from portfolio_rl_agent_lab.env.portfolio_env import PortfolioEnv
-
-def load_returns(path="artifacts/data/processed/returns.parquet"):
-    return pd.read_parquet(path)
 
 def max_drawdown(nav: np.ndarray) -> float:
     peak = np.maximum.accumulate(nav)
