@@ -1,36 +1,58 @@
-<p align="center">
-  <img src="assets/logo.png" width="1000" />
+<!-- <p align="center">
+  <img src="assets/logo.png" width="300" />
 </p>
-
+ -->
 <h1 align="center">R²PA</h1>
 
 <p align="center">
-  Regime-aware Reinforcement Learning for Portfolio Allocation
+  <b>Regime-aware Reinforcement Learning for Portfolio Allocation</b>
 </p>
 
 <p align="center">
-  <sub>Implemented in <code>Portfolio-RL-Agent-Lab</code></sub>
+  <sub>
+    A research-oriented RL system for regime-conditioned portfolio decision making<br/>
+    <i>implemented in <code>Portfolio-RL-Agent-Lab</code></i>
+  </sub>
 </p>
 
-A research-oriented sandbox for building and evaluating a **portfolio allocation agent** trained with **PPO**. The agent can consume **regime features** from a pluggable “Regime Oracle” (heuristic or local LLM) and is evaluated with backtests and diagnostics.
+R²PA is a **research-oriented reinforcement learning system** for portfolio allocation under **latent market regimes**.
 
-## Why this repo
+The core idea is to **separate expensive regime inference from downstream decision learning**:
 
-- End-to-end RL workflow for daily portfolio allocation
-- Pluggable regime features (heuristic or local LLM)
-- Clear data → features → regime → train → eval pipeline
+- Market regimes are inferred by a pluggable **Regime Oracle** (heuristics or local LLMs)
+- Regime signals are consumed as structured state by a **PPO-based portfolio policy**
+- Training-time intelligence is decoupled from inference-time execution
+
+This repo serves as a sandbox for studying **regime-aware decision policies**, not as a trading bot or alpha signal generator.
+
+## Why R²PA
+
+Most RL trading examples attempt to learn market structure end-to-end from price data.
+R²PA instead treats **market regime as an explicit latent state**, supplied by an external oracle
+and used to condition portfolio decisions.
+
+This repo is designed to explore:
+
+- **Regime-aware portfolio allocation** rather than price prediction
+- **Teacher / oracle → policy** decoupling for realistic deployment constraints
+- A clean, artifact-driven pipeline from data to evaluation
+
 
 ## Architecture (high level)
 
 ```mermaid
 flowchart LR
-  A[Market Data] --> B[Returns]
-  B --> C[Text Features]
-  C --> D[Regime Oracle]
-  B --> D
-  D --> E[RL Environment]
-  E --> F[PPO Training]
-  F --> G[Backtest & Diagnostics]
+    A[Market Data] --> B[Returns]
+    A --> C[Text / News Features]
+
+    B --> D[Regime Oracle]
+    C --> D
+
+    D -->|Regime Signals| E[RL Environment]
+    B --> E
+
+    E --> F[PPO Policy Training]
+    F --> G[Backtest & Diagnostics]
 ```
 
 ## Repository layout
