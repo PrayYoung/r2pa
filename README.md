@@ -1,4 +1,16 @@
-# Portfolio-RL-Agent-Lab
+<p align="center">
+  <img src="assets/logo.png" width="1000" />
+</p>
+
+<h1 align="center">R²PA</h1>
+
+<p align="center">
+  Regime-aware Reinforcement Learning for Portfolio Allocation
+</p>
+
+<p align="center">
+  <sub>Implemented in <code>Portfolio-RL-Agent-Lab</code></sub>
+</p>
 
 A research-oriented sandbox for building and evaluating a **portfolio allocation agent** trained with **PPO**. The agent can consume **regime features** from a pluggable “Regime Oracle” (heuristic or local LLM) and is evaluated with backtests and diagnostics.
 
