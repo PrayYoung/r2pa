@@ -58,19 +58,17 @@ flowchart LR
 
 ## Repository layout
 
-- `portfolio_rl_agent_lab/data/` — data download + dataset building
-- `portfolio_rl_agent_lab/data/io.py` — shared data loaders
-- `portfolio_rl_agent_lab/features/market.py` — shared market summary features
-- `portfolio_rl_agent_lab/text/` — news loading + text feature extraction
-- `portfolio_rl_agent_lab/llm/` — regime feature builders (heuristic/local LLM)
-- `portfolio_rl_agent_lab/student/` — student model pipeline
-- `portfolio_rl_agent_lab/env/` — portfolio environment
-- `portfolio_rl_agent_lab/train/` — RL training (PPO/A2C/SAC/TD3)
-- `portfolio_rl_agent_lab/rl/registry.py` — algorithm registry/model loader
-- `portfolio_rl_agent_lab/eval/` — backtest, benchmarks, diagnostics
-- `portfolio_rl_agent_lab/pipeline/` — orchestrated pipelines
-- `portfolio_rl_agent_lab/cli/` — CLI entrypoints
-- `artifacts/` — generated data/models/logs (gitignored)
+- `src/portfolio_rl_agent_lab/data/` - download market data and build returns
+- `src/portfolio_rl_agent_lab/text/` - news fetching, loading, and text features
+- `src/portfolio_rl_agent_lab/llm/` - regime oracles and regime-feature builders
+- `src/portfolio_rl_agent_lab/student/` - teacher-student distillation pipeline
+- `src/portfolio_rl_agent_lab/env/` - portfolio environment definition
+- `src/portfolio_rl_agent_lab/train/` - RL training entrypoints (`ppo/a2c/sac/td3`)
+- `src/portfolio_rl_agent_lab/eval/` - backtest, benchmarks, diagnostics
+- `src/portfolio_rl_agent_lab/infer/` - single-date allocation inference
+- `src/portfolio_rl_agent_lab/pipeline/` - end-to-end workflow orchestration
+- `src/portfolio_rl_agent_lab/cli/` - user-facing CLI (`prl ...`)
+- `artifacts/` - generated data/models/logs (gitignored)
 
 ## Quickstart (uv)
 
@@ -80,7 +78,7 @@ source .venv/bin/activate
 uv sync
 ```
 
-### Minimal run (heuristic regime)
+## Fast start (recommended)
 
 ```bash
 uv run python -m portfolio_rl_agent_lab.data.download
@@ -92,7 +90,9 @@ uv run python -m portfolio_rl_agent_lab.eval.benchmarks
 uv run python -m portfolio_rl_agent_lab.eval.diagnostics
 ```
 
-### Train with different RL algorithms
+## Core workflows
+
+Train with different RL algorithms:
 
 ```bash
 prl rl train --algo ppo
@@ -101,9 +101,25 @@ prl rl train --algo sac
 prl rl train --algo td3
 ```
 
-## CLI
+Evaluate a trained model:
 
-After `uv sync`, the `prl` command is available. If you don’t want to install the script, use the module form: `uv run python -m portfolio_rl_agent_lab.cli ...`.
+```bash
+prl rl benchmarks --algo ppo --model artifacts/models/ppo_portfolio
+prl rl diagnostics --algo ppo --model artifacts/models/ppo_portfolio
+prl rl backtest --algo ppo --model artifacts/models/ppo_portfolio
+```
+
+Run inference for one date:
+
+```bash
+prl infer run --algo ppo --model artifacts/models/ppo_portfolio --asof 2025-12-31
+```
+
+## CLI usage
+
+- Main command: `prl`
+- Module fallback: `uv run python -m portfolio_rl_agent_lab.cli ...`
+- Legacy fallback: `python main.py ...` (delegates to the same CLI)
 
 ```bash
 prl data download
@@ -112,7 +128,7 @@ prl rl train --algo ppo
 prl rl benchmarks --algo ppo
 ```
 
-## Pipeline
+## Pipeline commands
 
 ```bash
 prl pipeline data
@@ -123,28 +139,28 @@ prl pipeline rl --algo ppo
 prl pipeline all --source heuristic --algo ppo
 ```
 
-## Inference (single date)
+## Live inference examples
 
 ```bash
 prl infer run --model artifacts/models/ppo_portfolio --algo ppo --asof 2025-12-31
 ```
 
-Live Yahoo data (latest available date)
+Live Yahoo prices (latest date in downloaded window):
 ```bash
 prl infer run --live-yahoo --lookback-days 180
 ```
 
-Real-time regime (heuristic)
+Live Yahoo + real-time heuristic regime:
 ```bash
 prl infer run --live-yahoo --lookback-days 180 --regime-source heuristic
 ```
 
-Real-time regime (local LLM + live news)
+Live Yahoo + live news + local LLM regime:
 ```bash
 prl infer run --live-yahoo --live-news --regime-source local --news-lookback-days 5
 ```
 
-Note: use the same ticker order as the model was trained on (defaults to `CFG.tickers`).
+Use the same ticker order as training (defaults to `CFG.tickers`).
 
 ## Notes
 
