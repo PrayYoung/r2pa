@@ -90,6 +90,24 @@ uv run python -m portfolio_rl_agent_lab.eval.benchmarks
 uv run python -m portfolio_rl_agent_lab.eval.diagnostics
 ```
 
+One-command quickstart script:
+
+```bash
+./scripts/quickstart.sh
+```
+
+Optional settings:
+
+```bash
+ALGO=sac TIMESTEPS=50000 REGIME_SOURCE=heuristic ./scripts/quickstart.sh
+```
+
+Notebook walkthrough:
+
+```bash
+notebooks/01_quickstart.ipynb
+```
+
 ## Core workflows
 
 Train with different RL algorithms:
