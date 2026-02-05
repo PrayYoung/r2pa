@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
-from stable_baselines3 import PPO
 from portfolio_rl_agent_lab.config import CFG
-from portfolio_rl_agent_lab.core.io import load_returns
+from portfolio_rl_agent_lab.data.io import load_returns
+from portfolio_rl_agent_lab.rl.registry import load_model
 from portfolio_rl_agent_lab.env.portfolio_env import PortfolioEnv
 
 def backtest(model, returns: pd.DataFrame):
@@ -35,13 +35,14 @@ def backtest(model, returns: pd.DataFrame):
 def run_backtest(
     returns_path: str = "artifacts/data/processed/returns.parquet",
     model_path: str = "artifacts/models/ppo_portfolio",
+    algo: str = "ppo",
 ):
     returns = load_returns(returns_path)
     split = int(len(returns) * 0.8)
 
     test_returns = returns.iloc[split:].copy()
 
-    model = PPO.load(model_path)
+    model = load_model(model_path, algo=algo)
 
     nav, rets = backtest(model, test_returns)
 

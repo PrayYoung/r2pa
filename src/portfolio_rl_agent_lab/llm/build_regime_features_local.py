@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 
 from portfolio_rl_agent_lab.config import CFG
-from portfolio_rl_agent_lab.core.io import load_news_features, load_returns
-from portfolio_rl_agent_lab.core.market import compute_market_summary
+from portfolio_rl_agent_lab.data.io import load_news_features, load_returns
+from portfolio_rl_agent_lab.features.market import compute_market_summary
 from portfolio_rl_agent_lab.llm.store import save_regime_store
 from portfolio_rl_agent_lab.llm.oracle_local import local_regime_from_summary
 from portfolio_rl_agent_lab.text.news_loader import load_news_map

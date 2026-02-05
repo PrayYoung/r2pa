@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 
-def run_rl_pipeline() -> None:
-    from portfolio_rl_agent_lab.train.train_ppo import main as train_main
-    from portfolio_rl_agent_lab.eval.backtest import main as backtest_main
-    from portfolio_rl_agent_lab.eval.benchmarks import main as benchmarks_main
-    from portfolio_rl_agent_lab.eval.diagnostics import main as diagnostics_main
+def run_rl_pipeline(algo: str = "ppo") -> None:
+    from portfolio_rl_agent_lab.train.train_rl import train_rl
+    from portfolio_rl_agent_lab.eval.backtest import run_backtest
+    from portfolio_rl_agent_lab.eval.benchmarks import run_benchmarks
+    from portfolio_rl_agent_lab.eval.diagnostics import run_diagnostics
 
-    train_main()
-    benchmarks_main()
-    diagnostics_main()
-    backtest_main()
+    model_path = f"artifacts/models/{algo}_portfolio"
+    train_rl(algo=algo, model_path=model_path)
+    run_benchmarks(algo=algo, model_path=model_path)
+    run_diagnostics(algo=algo, model_path=model_path)
+    run_backtest(algo=algo, model_path=model_path)
 
 
 if __name__ == "__main__":

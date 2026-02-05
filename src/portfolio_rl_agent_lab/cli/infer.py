@@ -12,6 +12,7 @@ def cmd_run(args):
     tickers = _parse_tickers(args.tickers) if args.tickers else None
     result = run_policy(
         model_path=args.model,
+        algo=args.algo,
         returns_path=args.returns,
         asof=args.asof,
         current_weights=cw,
@@ -33,12 +34,13 @@ def main():
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     p = sub.add_parser("run", help="Run single-date inference")
-    p.add_argument("--model", default="artifacts/models/ppo_portfolio", help="Path to PPO model")
+    p.add_argument("--model", default="artifacts/models/ppo_portfolio", help="Path to trained RL model")
+    p.add_argument("--algo", choices=["ppo", "a2c", "sac", "td3"], default="ppo", help="RL algorithm type")
     p.add_argument("--returns", default="artifacts/data/processed/returns.parquet", help="Returns parquet")
     p.add_argument("--asof", default=None, help="YYYY-MM-DD (default: last date in returns)")
     p.add_argument("--current-weights", default=None, help="Comma list of current weights")
     p.add_argument("--no-regime", action="store_true", help="Disable regime features")
-    p.add_argument("--regime-source", default=None, help="Override CFG.regime_source")
+    p.add_argument("--regime-source", default="heuristic", help="Regime source: heuristic|local|student")
     p.add_argument("--out", default=None, help="Write output JSON to path")
     p.add_argument("--live-yahoo", action="store_true", help="Fetch latest prices from Yahoo for inference")
     p.add_argument("--tickers", default=None, help="Comma list of tickers (defaults to CFG.tickers)")

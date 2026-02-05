@@ -4,8 +4,8 @@ import argparse
 
 
 def cmd_build_local(args):
-    from portfolio_rl_agent_lab.llm.build_regime_features_local import main as build_main
-    build_main(max_steps=args.max_steps)
+    from portfolio_rl_agent_lab.llm.build_regime_features_local import build_regime_features_local
+    build_regime_features_local(max_steps=args.max_steps)
 
 
 def main():

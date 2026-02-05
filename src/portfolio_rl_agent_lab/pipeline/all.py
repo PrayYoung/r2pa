@@ -11,7 +11,7 @@ from portfolio_rl_agent_lab.pipeline.rl import run_rl_pipeline
 RegimeSource = Literal["heuristic", "local", "student"]
 
 
-def run_all_pipeline(source: RegimeSource) -> None:
+def run_all_pipeline(source: RegimeSource, algo: str = "ppo") -> None:
     run_data_pipeline()
     run_text_pipeline()
 
@@ -22,7 +22,7 @@ def run_all_pipeline(source: RegimeSource) -> None:
     else:
         run_regime_pipeline(source)
 
-    run_rl_pipeline()
+    run_rl_pipeline(algo=algo)
 
 
 if __name__ == "__main__":

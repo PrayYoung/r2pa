@@ -6,7 +6,7 @@ import pandas as pd
 import torch
 
 from portfolio_rl_agent_lab.config import CFG
-from portfolio_rl_agent_lab.core.market import compute_market_summary
+from portfolio_rl_agent_lab.features.market import compute_market_summary
 
 
 # ---------- feature contract ----------

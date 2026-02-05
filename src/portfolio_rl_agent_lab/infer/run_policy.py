@@ -6,12 +6,12 @@ from typing import List, Optional
 
 import numpy as np
 import pandas as pd
-from stable_baselines3 import PPO
 import yfinance as yf
 
 from portfolio_rl_agent_lab.config import CFG
-from portfolio_rl_agent_lab.core.io import load_returns
-from portfolio_rl_agent_lab.core.market import compute_market_summary
+from portfolio_rl_agent_lab.data.io import load_returns
+from portfolio_rl_agent_lab.features.market import compute_market_summary
+from portfolio_rl_agent_lab.rl.registry import load_model
 from portfolio_rl_agent_lab.env.portfolio_env import _simplex_project
 from portfolio_rl_agent_lab.llm.oracle_heuristic import heuristic_from_summary
 from portfolio_rl_agent_lab.llm.oracle_local import local_regime_from_summary
@@ -103,6 +103,7 @@ def _fetch_live_news_alpaca(
 
 def run_policy(
     model_path: str,
+    algo: str,
     returns_path: str,
     asof: Optional[str],
     current_weights: Optional[np.ndarray],
@@ -116,8 +117,7 @@ def run_policy(
     news_lookback_days: int,
     news_include_content: bool,
 ) -> dict:
-    if regime_source is not None:
-        CFG.regime_source = regime_source
+    CFG.regime_source = regime_source or "heuristic"
 
     if not use_regime:
         CFG.use_regime_features = False
@@ -127,9 +127,9 @@ def run_policy(
         returns = _fetch_live_returns(tickers, lookback_days=lookback_days)
         if live_news and getattr(CFG, "regime_source", None) != "local":
             print("[infer] live_news is enabled but regime_source is not 'local'; ignoring live_news.")
-        if CFG.use_regime_features and getattr(CFG, "regime_source", None) != "heuristic":
+        if CFG.use_regime_features and getattr(CFG, "regime_source", None) not in {"heuristic", "local"}:
             print(
-                "[infer] live_yahoo enabled but regime_source is not 'heuristic'; "
+                "[infer] live_yahoo enabled but regime_source is neither 'heuristic' nor 'local'; "
                 "falling back to stored regime features."
             )
     else:
@@ -197,7 +197,7 @@ def run_policy(
         regime_row=regime_row,
     )
 
-    model = PPO.load(model_path)
+    model = load_model(model_path, algo=algo)
     action, _ = model.predict(obs, deterministic=True)
     w = _simplex_project(np.array(action, dtype=np.float32))
 
@@ -209,6 +209,7 @@ def run_policy(
     result = {
         "asof": asof_ts.strftime("%Y-%m-%d"),
         "model_path": model_path,
+        "algo": algo,
         "regime_source": getattr(CFG, "regime_source", None),
         "use_regime": bool(CFG.use_regime_features),
         "tickers": list(returns.columns),
@@ -224,12 +225,13 @@ def run_policy(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run policy inference for a single date")
-    parser.add_argument("--model", default="artifacts/models/ppo_portfolio", help="Path to PPO model")
+    parser.add_argument("--model", default="artifacts/models/ppo_portfolio", help="Path to trained RL model")
+    parser.add_argument("--algo", choices=["ppo", "a2c", "sac", "td3"], default="ppo", help="RL algorithm type")
     parser.add_argument("--returns", default="artifacts/data/processed/returns.parquet", help="Returns parquet")
     parser.add_argument("--asof", default=None, help="YYYY-MM-DD (default: last date in returns)")
     parser.add_argument("--current-weights", default=None, help="Comma list of current weights")
     parser.add_argument("--no-regime", action="store_true", help="Disable regime features")
-    parser.add_argument("--regime-source", default=None, help="Override CFG.regime_source")
+    parser.add_argument("--regime-source", default="heuristic", help="Regime source: heuristic|local|student")
     parser.add_argument("--out", default=None, help="Write output JSON to path")
     parser.add_argument("--live-yahoo", action="store_true", help="Fetch latest prices from Yahoo for inference")
     parser.add_argument("--tickers", default=None, help="Comma list of tickers (defaults to CFG.tickers)")
@@ -244,6 +246,7 @@ def main() -> None:
     tickers = _parse_tickers(args.tickers) if args.tickers else None
     result = run_policy(
         model_path=args.model,
+        algo=args.algo,
         returns_path=args.returns,
         asof=args.asof,
         current_weights=cw,

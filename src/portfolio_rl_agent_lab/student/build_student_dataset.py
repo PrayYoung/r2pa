@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from portfolio_rl_agent_lab.config import CFG
-from portfolio_rl_agent_lab.core.market import compute_market_summary
+from portfolio_rl_agent_lab.features.market import compute_market_summary
 
 
 def build_student_dataset(

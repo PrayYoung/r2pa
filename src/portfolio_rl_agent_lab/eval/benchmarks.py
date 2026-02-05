@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from stable_baselines3 import PPO
 from portfolio_rl_agent_lab.config import CFG
-from portfolio_rl_agent_lab.core.io import load_returns
+from portfolio_rl_agent_lab.data.io import load_returns
+from portfolio_rl_agent_lab.rl.registry import load_model
 from portfolio_rl_agent_lab.env.portfolio_env import PortfolioEnv
 
 def max_drawdown(nav: np.ndarray) -> float:
@@ -17,7 +17,7 @@ def sharpe(rets: np.ndarray, ann=252) -> float:
         return 0.0
     return float(np.mean(rets) / std * np.sqrt(ann))
 
-def run_rl_policy(model: PPO, returns: pd.DataFrame):
+def run_rl_policy(model, returns: pd.DataFrame):
     env = PortfolioEnv(returns, window=CFG.window, trading_cost_bps=CFG.trading_cost_bps, cash_asset=CFG.cash_asset)
     obs, _ = env.reset()
 
@@ -109,19 +109,20 @@ def run_benchmarks(
     returns_path: str = "artifacts/data/processed/returns.parquet",
     model_path: str = "artifacts/models/ppo_portfolio",
     out_plot_path: str = "artifacts/data/processed/test_nav.png",
+    algo: str = "ppo",
 ):
     returns = load_returns(returns_path)
     split = int(len(returns) * 0.8)
     test_returns = returns.iloc[split:].copy()
 
-    model = PPO.load(model_path)
+    model = load_model(model_path, algo=algo)
 
     nav_rl, rets_rl, dates = run_rl_policy(model, test_returns)
     nav_eq, rets_eq, _ = run_equal_weight_daily(test_returns)
     nav_bh, rets_bh, _ = run_buy_and_hold_equal_weight(test_returns)
 
     print("\n=== TEST BENCHMARKS (out-of-sample) ===")
-    summarize("RL PPO", nav_rl, rets_rl)
+    summarize(f"RL {algo.upper()}", nav_rl, rets_rl)
     summarize("EqualW Daily", nav_eq, rets_eq)
     summarize("BuyHold EqualW", nav_bh, rets_bh)
 
@@ -134,7 +135,7 @@ def run_benchmarks(
 
     # Plot
     plt.figure()
-    plt.plot(dates[:L], y1[:L], label="RL PPO")
+    plt.plot(dates[:L], y1[:L], label=f"RL {algo.upper()}")
     plt.plot(dates[:L], y2[:L], label="EqualW Daily")
     plt.plot(dates[:L], y3[:L], label="BuyHold EqualW")
     plt.title("Out-of-sample NAV (Test)")

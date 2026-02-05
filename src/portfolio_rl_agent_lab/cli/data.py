@@ -11,12 +11,8 @@ def cmd_download(_args):
 
 
 def cmd_news_alpaca(args):
-    from portfolio_rl_agent_lab.text.build_news_daily_alpaca import main as alpaca_main
-
-    # Minimal approach: temporarily patch by setting a global, or better:
-    # Refactor build_news_daily_alpaca.main to accept days/symbols later (Phase 2).
-    # For now, just run main and keep behavior unchanged.
-    alpaca_main(lookback_days=args.days)
+    from portfolio_rl_agent_lab.text.build_news_daily_alpaca import build_news_daily_alpaca
+    build_news_daily_alpaca(lookback_days=args.days)
 
 
 def main():
